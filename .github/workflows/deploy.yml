@@ -1,0 +1,94 @@
+name: Deploy do portfólio
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: portfolio-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publicar no servidor
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Configurar acesso SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Atualizar e publicar
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_SHA: ${{ github.sha }}
+        run: |
+          ssh -i ~/.ssh/deploy_key "$SERVER_USER@$SERVER_HOST" "DEPLOY_SHA=$DEPLOY_SHA bash -s" <<'DEPLOY'
+          set -Eeuo pipefail
+
+          APP_DIR=/home/ubuntu/apps/portfolio
+          IMAGE="portfolio:$DEPLOY_SHA"
+          CANDIDATE=portfolio-candidate
+
+          cd "$APP_DIR"
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+
+          docker build -t "$IMAGE" .
+
+          docker rm -f "$CANDIDATE" >/dev/null 2>&1 || true
+          docker run -d \
+            --name "$CANDIDATE" \
+            -p 127.0.0.1:18080:80 \
+            "$IMAGE"
+
+          healthy=false
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:18080/ >/dev/null 2>&1; then
+              healthy=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$healthy" != true ]; then
+            docker logs "$CANDIDATE" || true
+            docker rm -f "$CANDIDATE" || true
+            exit 1
+          fi
+
+          docker rm -f "$CANDIDATE"
+          docker rm -f portfolio >/dev/null 2>&1 || true
+          docker run -d \
+            --name portfolio \
+            --restart unless-stopped \
+            -p 127.0.0.1:8080:80 \
+            "$IMAGE"
+
+          healthy=false
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8080/ >/dev/null 2>&1; then
+              healthy=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$healthy" != true ]; then
+            docker logs portfolio || true
+            exit 1
+          fi
+
+          docker tag "$IMAGE" portfolio:1.0
+          DEPLOY
