@@ -55,7 +55,7 @@ jobs:
 
           healthy=false
           for attempt in $(seq 1 20); do
-            if curl --fail --silent --show-error http://127.0.0.1:18080/ >/dev/null; then
+            if curl --fail --silent http://127.0.0.1:18080/ >/dev/null 2>&1; then
               healthy=true
               break
             fi
@@ -76,8 +76,19 @@ jobs:
             -p 127.0.0.1:8080:80 \
             "$IMAGE"
 
-          curl --fail --silent --show-error --retry 10 --retry-delay 1 \
-            http://127.0.0.1:8080/ >/dev/null
+          healthy=false
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8080/ >/dev/null 2>&1; then
+              healthy=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$healthy" != true ]; then
+            docker logs portfolio || true
+            exit 1
+          fi
 
           docker tag "$IMAGE" portfolio:1.0
           DEPLOY
