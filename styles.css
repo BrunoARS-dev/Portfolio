@@ -1031,10 +1031,11 @@ main > .contact {
     
     .projects .projects-grid {
         --visible-projects: 2;
+        --visible-gaps: 1;
     }
 
     .projects .projects-grid > .card {
-        flex-basis: calc((100% - 1.5rem) / var(--visible-projects));
+        flex-basis: calc((100% - (1.5rem * var(--visible-gaps))) / var(--visible-projects));
     }
 
     .practice-areas .projects-grid {
@@ -1095,6 +1096,7 @@ main > .contact {
 @media (min-width: 1024px) {
     .projects .projects-grid {
         --visible-projects: 3;
+        --visible-gaps: 2;
     }
 
     .practice-areas .projects-grid {
@@ -1110,6 +1112,27 @@ main > .contact {
     .contact-form h3 {
         padding-top: 0;
         border-top: none;
+    }
+}
+
+@media (min-width: 1440px) {
+    .projects .container {
+        max-width: 100rem;
+    }
+
+    .projects-heading,
+    .projects .projects-grid {
+        max-width: 96rem;
+    }
+
+    .projects .projects-grid {
+        --visible-projects: 4;
+        --visible-gaps: 3;
+        overflow-x: hidden;
+    }
+
+    .projects .carousel-controls {
+        display: none;
     }
 }
 
