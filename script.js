@@ -72,6 +72,46 @@ tabBtns.forEach(btn => {
     });
 });
 
+// Projects carousel
+const projectsCarousel = document.querySelector('[data-projects-carousel]');
+const projectsPrevButton = document.querySelector('[data-carousel-prev]');
+const projectsNextButton = document.querySelector('[data-carousel-next]');
+
+if (projectsCarousel && projectsPrevButton && projectsNextButton) {
+    const getScrollAmount = () => {
+        const firstCard = projectsCarousel.querySelector('.card');
+        const carouselStyles = window.getComputedStyle(projectsCarousel);
+        const gap = parseFloat(carouselStyles.columnGap || carouselStyles.gap) || 0;
+
+        return firstCard ? firstCard.getBoundingClientRect().width + gap : projectsCarousel.clientWidth;
+    };
+
+    const updateCarouselButtons = () => {
+        const maxScrollLeft = projectsCarousel.scrollWidth - projectsCarousel.clientWidth;
+        projectsPrevButton.disabled = projectsCarousel.scrollLeft <= 1;
+        projectsNextButton.disabled = projectsCarousel.scrollLeft >= maxScrollLeft - 1;
+    };
+
+    const moveCarousel = direction => {
+        projectsCarousel.scrollBy({
+            left: getScrollAmount() * direction,
+            behavior: 'smooth'
+        });
+    };
+
+    projectsPrevButton.addEventListener('click', () => moveCarousel(-1));
+    projectsNextButton.addEventListener('click', () => moveCarousel(1));
+    projectsCarousel.addEventListener('scroll', updateCarouselButtons, { passive: true });
+    projectsCarousel.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            moveCarousel(event.key === 'ArrowLeft' ? -1 : 1);
+        }
+    });
+    window.addEventListener('resize', updateCarouselButtons);
+    updateCarouselButtons();
+}
+
 // Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {

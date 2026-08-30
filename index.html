@@ -442,8 +442,18 @@
         <!-- Projects Section -->
         <section id="projects" class="projects">
             <div class="container">
-                <h2 class="section-title">Projetos em Destaque</h2>
-                <div class="projects-grid">
+                <div class="projects-heading">
+                    <h2 class="section-title">Projetos em Destaque</h2>
+                    <div class="carousel-controls" aria-label="Navegação do carrossel de projetos">
+                        <button class="carousel-button" type="button" data-carousel-prev aria-label="Projeto anterior">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <button class="carousel-button" type="button" data-carousel-next aria-label="Próximo projeto">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="projects-grid" data-projects-carousel tabindex="0" aria-label="Projetos em destaque">
                     <div class="card">
                         <div class="project-image">
                             <img src="./src/img/central-combate.jpeg" alt="Tela de login do projeto Central Combate Fire">
@@ -545,6 +555,38 @@
                                 </a>
                                 <div class="repo-links" aria-label="Repositórios do projeto SASF">
                                     <a href="https://github.com/BrunoARS-dev/SASF" target="_blank" rel="noopener noreferrer">
+                                        <i class="fab fa-github"></i> Full Stack
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="project-image">
+                            <img src="./src/img/cardapio.png" alt="Página inicial do cardápio digital Brasa &amp; Manjericão">
+                        </div>
+                        <div class="card-header">
+                            <i class="fas fa-utensils"></i>
+                            <h3>Cardápio Digital</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>
+                                Cardápio digital responsivo para restaurante, com navegação por categorias, carrinho de compras e finalização de pedidos pelo WhatsApp.
+                            </p>
+                            <div class="tags">
+                                <span class="tag">Next.js</span>
+                                <span class="tag">React</span>
+                                <span class="tag">TypeScript</span>
+                                <span class="tag">Tailwind CSS</span>
+                                <span class="tag">Docker</span>
+                            </div>
+                            <div class="project-links">
+                                <a href="https://cardapio.brunoaraujo.dev.br/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                                    <i class="fas fa-arrow-up-right-from-square"></i> Ver Projeto
+                                </a>
+                                <div class="repo-links" aria-label="Repositório do projeto Cardápio Digital">
+                                    <a href="https://github.com/BrunoARS-dev/cardapio" target="_blank" rel="noopener noreferrer">
                                         <i class="fab fa-github"></i> Full Stack
                                     </a>
                                 </div>
